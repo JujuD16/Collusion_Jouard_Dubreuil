@@ -2,12 +2,14 @@
     <string name="app_name">App1</string>
     <string name="title_activity_scrolling_contact"></string>
     <string name="action_settings">Settings</string>
-    <string name="name">NOM</string>
-    <string name="forename">Prénom</string>
+
+    <string name="name">Prénom NOM</string>
     <string name="phoneNumber">numéro</string>
     <string name="mailAddr">Prenom.Nom@enseirb-matmeca.fr</string>
     <string name="postalAddrRoad">Adresse</string>
     <string name="postalAddrCode">Code Postal</string>
     <string name="postalAddrCity">Ville</string>
     <string name="note">note</string>
+
+
 </resources>

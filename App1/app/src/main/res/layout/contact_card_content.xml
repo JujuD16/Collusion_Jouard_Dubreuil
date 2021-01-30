@@ -18,27 +18,6 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
-
-            <TextView
-                android:id="@+id/forename"
-                android:layout_width="188dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_weight="1"
-                android:text="@string/forename"
-                android:textSize="36sp"
-                android:textStyle="bold" />
-
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_margin="5dp">
 
             <TextView
@@ -48,7 +27,7 @@
                 android:layout_marginHorizontal="5dp"
                 android:layout_weight="0"
                 android:text="@string/name"
-                android:textSize="36sp"
+                android:textSize="40sp"
                 android:textStyle="bold" />
         </TableRow>
 
