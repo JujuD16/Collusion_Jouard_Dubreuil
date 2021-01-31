@@ -25,11 +25,18 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Uri CONTENT_URI     = ContactsContract.Contacts.CONTENT_URI;
+    private String ID           = ContactsContract.Contacts._ID;
+    private String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
+
     private RecyclerView recyclerView;
     private ContactsAdapter contactsAdapter;
     private List<ContactInfo> contactInfoList = new ArrayList<>();
     private static String[] PERMISSION_CONTACT = {Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS};
     private static final int REQUEST_CONTACT = 1;
+
+    private ContentResolver contentResolver;
+    private Cursor cursor;
 
     // This method initialise the activity
     @Override
@@ -80,12 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
     // This method downloads contacts from the device
     private void getContactsInfo(){
-        Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
-        String ID = ContactsContract.Contacts._ID;
-        String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
-
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = contentResolver.query(CONTENT_URI,null,null,null,DISPLAY_NAME);
+        contentResolver = getContentResolver();
+        cursor = contentResolver.query(CONTENT_URI,null,null,null,DISPLAY_NAME);
 
         if (cursor.getCount() > 0){
             while (cursor.moveToNext()){

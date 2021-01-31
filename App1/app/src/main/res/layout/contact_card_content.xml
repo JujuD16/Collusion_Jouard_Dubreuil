@@ -66,6 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
+                android:onClick="onClickPhone"
                 app:srcCompat="@android:drawable/stat_sys_phone_call" />
 
         </TableRow>
@@ -90,6 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
+                android:onClick="onClickMail"
                 app:srcCompat="@android:drawable/ic_dialog_email" />
 
         </TableRow>
@@ -102,7 +104,7 @@
 
             <EditText
                 android:id="@+id/postalAddrRoad"
-                android:layout_width="wrap_content"
+                android:layout_width="316dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
                 android:layout_weight="1"
@@ -116,63 +118,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
+                android:onClick="onClickMap"
                 app:srcCompat="@android:drawable/ic_dialog_map" />
 
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="0dp">
-
-            <EditText
-                android:id="@+id/postalAddrCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textPostalAddress"
-                android:text="@string/postalAddrCode" />
-
-            <EditText
-                android:id="@+id/postalAddrCity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textPostalAddress"
-                android:text="@string/postalAddrCity" />
-
-        </TableRow>
-
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="20sp">
-            </Space>
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/note"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textLongMessage"
-                android:text="@string/note" />
         </TableRow>
 
     </TableLayout>

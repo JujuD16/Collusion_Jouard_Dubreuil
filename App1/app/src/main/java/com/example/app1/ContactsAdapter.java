@@ -25,9 +25,9 @@ import java.util.List;
 // =================================================================================================
 // extension of the RecyclerView.Adapter
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder> {
+
     private Context context;
     private List<ContactInfo> contactInfoList;
-    private static ClickListener clickListener;
 
     public ContactsAdapter(Context context, List<ContactInfo> contactInfoList){
         this.context = context;
@@ -61,15 +61,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         return contactInfoList.size();
     }
 
-    public interface ClickListener {
-        void onItemClick(int position, View v);
-        void onItemLongClick(int position, View v);
-    }
-
     // =============================================================================================
     // Extension of the RecyclerView.ViewHolder
     public class ContactsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView name, number;
+        TextView name;
 
         public ContactsViewHolder(@NonNull View itemView) {
             super (itemView);
