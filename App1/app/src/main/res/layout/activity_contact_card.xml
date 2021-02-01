@@ -40,11 +40,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
+        android:adjustViewBounds="false"
+        android:contentDescription="Favourite button"
+        android:focusable="auto"
+        android:foreground="@android:drawable/btn_star_big_off"
+        android:foregroundGravity="center"
         android:scaleX="1.5"
         android:scaleY="1.5"
-        android:contentDescription="Favourite button"
+        app:backgroundTint="#1CD4B8"
         app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/btn_star_big_off" />
+        app:layout_anchorGravity="bottom|end" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

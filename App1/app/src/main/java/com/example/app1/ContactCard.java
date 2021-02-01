@@ -8,12 +8,14 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -39,6 +41,7 @@ public class ContactCard extends AppCompatActivity {
     private static final String EMAIL_ID         = ContactsContract.CommonDataKinds.Email.CONTACT_ID;
     private static final String ADDR_ID          = ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID;
     private static final String NUMBER           = ContactsContract.CommonDataKinds.Phone.NUMBER;
+    private static final String FAVORITE         = ContactsContract.Contacts.STARRED;
 
     private String CONTACT_ID;
     private String name;
@@ -46,6 +49,7 @@ public class ContactCard extends AppCompatActivity {
     private String phones;
     private String emails;
     private String addr;
+    int favoriteContact;
     private List<String> phoneList = new ArrayList<>();
     private List<String> emailList = new ArrayList<>();
 
@@ -62,6 +66,7 @@ public class ContactCard extends AppCompatActivity {
     private CollapsingToolbarLayout toolBarLayout;
     private FloatingActionButton fab;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +83,24 @@ public class ContactCard extends AppCompatActivity {
         name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
         displayName = findViewById(R.id.name);
         displayName.setText(name);
+
+        // Recover if it is a favourite contact or not
+        favoriteContact = cursor.getInt(cursor.getColumnIndex(FAVORITE));
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        if (favoriteContact == 1) {
+            fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_on));
+        }
+        else {
+            fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_off));
+        }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
         // recover one or many phone numbers
         hasPhoneNumber = cursor.getInt(cursor.getColumnIndex(HAS_PHONE_NUMBER));
@@ -119,16 +142,6 @@ public class ContactCard extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         toolBarLayout.setTitle(getTitle());
-
-        // action for the favourite button
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     // This method permits to open Google Maps to have the route to the contact address
