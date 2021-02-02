@@ -46,9 +46,9 @@ public class ContactCard extends AppCompatActivity {
 
     private static final String ADDR_ID          = ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID;
     private static final Uri ADDR_URI            = ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI;
-    private static final String POSTAL_ADDRESS    = ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS;
+    private static final String POSTAL_ADDRESS   = ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS;
     private static final String STREET           = ContactsContract.CommonDataKinds.StructuredPostal.STREET;
-    private static final String ADDR_TYPE       = ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE;
+    private static final String ADDR_TYPE        = ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE;
 
     private static final String PHONE_ID         = ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
     private static final Uri PHONE_URI           = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
@@ -64,7 +64,7 @@ public class ContactCard extends AppCompatActivity {
     private String phones;
     private String emails;
     private String addr;
-    int favoriteContact;
+    int favoriteContact = 0;
     private List<String> phoneList = new ArrayList<>();
     private List<String> emailList = new ArrayList<>();
 
@@ -98,72 +98,85 @@ public class ContactCard extends AppCompatActivity {
         CONTACT_ID = intentRecovered.getStringExtra("id");
         contentResolver = getContentResolver();
 
-        // Recover the name
-        cursor = contentResolver.query(CONTENT_URI,null,ID+ " = ? ",new String[]{CONTACT_ID},null);
-        cursor.moveToFirst();
-        name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
-        displayName.setText(name);
-
-        // Recover if it is a favourite contact or not
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        favoriteContact = cursor.getInt(cursor.getColumnIndex(FAVORITE));
-        if (favoriteContact == 1) {
-            fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_on));
+        if (CONTACT_ID.isEmpty()){
+            fab = (FloatingActionButton) findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (favoriteContact == 1) {
+                        favoriteContact = 0;
+                    } else {
+                        favoriteContact = 1;
+                    }
+                }
+            });
         }
+
         else {
-            fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_off));
-        }
-        // Modify if it is a favourite contact or not
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (favoriteContact == 1) {
-                    favoriteContact = 0;
-                    contentValues.put(FAVORITE, favoriteContact);
-                    contentResolver.update(CONTENT_URI, contentValues, ID + "= ?", new String[]{CONTACT_ID});
-                    fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_off));
-                    contentValues.clear();
-                }
-                else {
-                    favoriteContact = 1;
-                    contentValues.put(FAVORITE, favoriteContact);
-                    contentResolver.update(CONTENT_URI, contentValues, ID + "= ?", new String[]{CONTACT_ID});
-                    fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_on));
-                    contentValues.clear();
-                }
-            }
-        });
-
-        // recover one or many phone numbers
-        hasPhoneNumber = cursor.getInt(cursor.getColumnIndex(HAS_PHONE_NUMBER));
-        if (hasPhoneNumber > 0){
-            cursor = contentResolver.query(PHONE_URI, new String[]{NUMBER},PHONE_ID+" = ?",new String[]{CONTACT_ID},null);
+            // Recover the name
+            cursor = contentResolver.query(CONTENT_URI, null, ID + " = ? ", new String[]{CONTACT_ID}, null);
             cursor.moveToFirst();
-            while (!cursor.isAfterLast()){
-                phoneList.add(cursor.getString(cursor.getColumnIndex(NUMBER))); // .replace(" ","")
-                cursor.moveToNext();
+            name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
+            displayName.setText(name);
+
+            // Recover if it is a favourite contact or not
+            fab = (FloatingActionButton) findViewById(R.id.fab);
+            favoriteContact = cursor.getInt(cursor.getColumnIndex(FAVORITE));
+            if (favoriteContact == 1) {
+                fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_on));
+            } else {
+                fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_off));
             }
-            phones = TextUtils.join("\n", phoneList);
-            displayPhone.setText(phones);
-            cursor.close();
-        }
+            // Modify if it is a favourite contact or not
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (favoriteContact == 1) {
+                        favoriteContact = 0;
+                        contentValues.put(FAVORITE, favoriteContact);
+                        contentResolver.update(CONTENT_URI, contentValues, ID + "= ?", new String[]{CONTACT_ID});
+                        fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_off));
+                    } else {
+                        favoriteContact = 1;
+                        contentValues.put(FAVORITE, favoriteContact);
+                        contentResolver.update(CONTENT_URI, contentValues, ID + "= ?", new String[]{CONTACT_ID});
+                        fab.setForeground(getResources().getDrawable(android.R.drawable.btn_star_big_on));
+                    }
+                    contentValues.clear();
+                }
+            });
 
-        // Recover the postal address
-        cursor = contentResolver.query(ADDR_URI,null,ADDR_ID+ " = ? ",new String[]{CONTACT_ID},null);
-        if (cursor.moveToNext()) {
-            addr = cursor.getString(cursor.getColumnIndex(STREET));
-            displayAddr.setText(addr);
-        }
+            // recover one or many phone numbers
+            hasPhoneNumber = cursor.getInt(cursor.getColumnIndex(HAS_PHONE_NUMBER));
+            if (hasPhoneNumber > 0) {
+                cursor = contentResolver.query(PHONE_URI, new String[]{NUMBER}, PHONE_ID + " = ?", new String[]{CONTACT_ID}, null);
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    phoneList.add(cursor.getString(cursor.getColumnIndex(NUMBER))); // .replace(" ","")
+                    cursor.moveToNext();
+                }
+                phones = TextUtils.join("\n", phoneList);
+                displayPhone.setText(phones);
+                cursor.close();
+            }
 
-        // Recover one or many mails
-        cursor = contentResolver.query(EMAIL_URI, new String[]{EMAIL_ADDRESS}, EMAIL_ID + " = ?", new String[]{CONTACT_ID}, null);
-        while (cursor.moveToNext()) {
-            emailList.add(cursor.getString(cursor.getColumnIndex(EMAIL)));
-        }
-        if (emailList.size() > 0) {
-            emails = TextUtils.join("\n", emailList);
-            displayEmail.setText(emails);
-            cursor.close();
+            // Recover the postal address
+            cursor = contentResolver.query(ADDR_URI, null, ADDR_ID + " = ? ", new String[]{CONTACT_ID}, null);
+            if (cursor.moveToNext()) {
+                addr = cursor.getString(cursor.getColumnIndex(STREET));
+                displayAddr.setText(addr);
+            }
+
+            // Recover one or many mails
+            cursor = contentResolver.query(EMAIL_URI, new String[]{EMAIL_ADDRESS}, EMAIL_ID + " = ?", new String[]{CONTACT_ID}, null);
+            while (cursor.moveToNext()) {
+                emailList.add(cursor.getString(cursor.getColumnIndex(EMAIL)));
+            }
+            if (emailList.size() > 0) {
+                emails = TextUtils.join("\n", emailList);
+                displayEmail.setText(emails);
+                cursor.close();
+            }
         }
 
         // launch the toolbar
@@ -188,29 +201,66 @@ public class ContactCard extends AppCompatActivity {
 
         String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
 
-        if(!name.equals("")) {
-            ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
-                    .withSelection(where,new String[]{CONTACT_ID, NAME_TYPE})
-                    .withValue(NAME, name)
+        if (CONTACT_ID.isEmpty()) {
+            ops.add(android.content.ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
                     .build());
-        }
-        if (!emails.equals(R.id.mailAddr)) {
-                ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
-                        .withSelection(where,new String[]{CONTACT_ID, EMAIL_TYPE})
+
+            if (!name.isEmpty()) {
+                ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(ContactsContract.Data.MIMETYPE, NAME_TYPE)
+                        .withValue(NAME, name)
+                        .build());
+            }
+            if (!emails.equals(R.id.mailAddr)) {
+                ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(ContactsContract.Data.MIMETYPE, EMAIL_TYPE)
                         .withValue(EMAIL, emails)
                         .build());
+            }
+            if (!phones.equals(R.id.phoneNumber)) {
+                ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(ContactsContract.Data.MIMETYPE, PHONE_TYPE)
+                        .withValue(NUMBER, phones)
+                        .build());
+            }
+            if (!addr.equals(R.id.postalAddr)) {
+                ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(ContactsContract.Data.MIMETYPE, ADDR_TYPE)
+                        .withValue(POSTAL_ADDRESS, addr)
+                        .build());
+            }
         }
-        if(!phones.equals(R.id.phoneNumber)) {
-            ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
-                    .withSelection(where,new String[]{CONTACT_ID, PHONE_TYPE})
-                    .withValue(NUMBER, phones)
-                    .build());
-        }
-        if(!addr.equals(R.id.postalAddr)) {
-            ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
-                    .withSelection(where,new String[]{CONTACT_ID, ADDR_TYPE})
-                    .withValue(POSTAL_ADDRESS, addr)
-                    .build());
+        else {
+            if (!name.isEmpty()) {
+                ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
+                        .withSelection(where, new String[]{CONTACT_ID, NAME_TYPE})
+                        .withValue(NAME, name)
+                        .build());
+            }
+            if (!emails.equals(R.id.mailAddr)) {
+                ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
+                        .withSelection(where, new String[]{CONTACT_ID, EMAIL_TYPE})
+                        .withValue(EMAIL, emails)
+                        .build());
+            }
+            if (!phones.equals(R.id.phoneNumber)) {
+                ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
+                        .withSelection(where, new String[]{CONTACT_ID, PHONE_TYPE})
+                        .withValue(NUMBER, phones)
+                        .build());
+            }
+            if (!addr.equals(R.id.postalAddr)) {
+                ops.add(android.content.ContentProviderOperation.newUpdate(PROVIDER)
+                        .withSelection(where, new String[]{CONTACT_ID, ADDR_TYPE})
+                        .withValue(POSTAL_ADDRESS, addr)
+                        .build());
+            }
         }
 
         try {
@@ -224,7 +274,7 @@ public class ContactCard extends AppCompatActivity {
 
     // This method permits to open Google Maps to have the route to the contact address
     public void onClickMap (View view) {
-        if (!addr.isEmpty()) {
+        if(!addr.equals(R.id.postalAddr)) {
             Uri mapsUri = Uri.parse("google.navigation:q="+addr);
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapsUri);
             mapIntent.setPackage("com.google.android.apps.maps");
@@ -234,7 +284,7 @@ public class ContactCard extends AppCompatActivity {
 
     // This method permits to call directly the first number of the contact
     public void onClickPhone (View view) {
-        if (phoneList.size() > 0){
+        if(!phones.equals(R.id.phoneNumber)) {
                 Uri phoneUri = Uri.parse("tel:"+phoneList.get(0));
                 Intent phoneIntent = new Intent(Intent.ACTION_DIAL, phoneUri);
                 startActivity(phoneIntent);
@@ -243,7 +293,7 @@ public class ContactCard extends AppCompatActivity {
 
     // This method permits to write a mail directly the first number of the contact
     public void onClickMail (View view) {
-        if (emailList.size() > 0){
+        if (!emails.equals(R.id.mailAddr)) {
             Intent mailIntent = new Intent(Intent.ACTION_SENDTO);
             mailIntent.setData(Uri.parse("mailto:"));
             mailIntent.putExtra(Intent.EXTRA_EMAIL, emailList.get(0));

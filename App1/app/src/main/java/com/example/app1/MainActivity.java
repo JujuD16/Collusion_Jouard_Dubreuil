@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -119,5 +120,12 @@ public class MainActivity extends AppCompatActivity {
                 getContactsInfo();
             }
         }
+    }
+
+    // This method launch the page to create a new contact
+    public void onClickPlus (View view) {
+        Intent intent = new Intent(this,ContactCard.class);
+        intent.putExtra("id", "");
+        this.startActivity(intent);
     }
 }

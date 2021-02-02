@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +9,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/titleLayout">
 
         <TextView
             android:layout_width="match_parent"
@@ -18,7 +20,7 @@
             android:text="Contact List"
             android:textSize="50sp"
             android:textColor="@color/black"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -30,8 +32,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/recyclerView"
-            android:layout_margin="10dp"/>
+            android:layout_margin="10dp" />
 
     </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPlus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:adjustViewBounds="false"
+        android:contentDescription="Add button"
+        android:focusable="auto"
+        android:foreground="@android:drawable/ic_menu_add"
+        android:foregroundGravity="center"
+        app:backgroundTint="#1CD4B8"
+        app:layout_anchor="@id/titleLayout"
+        app:layout_anchorGravity="bottom|end"
+        android:onClick="onClickPlus"/>
 
 </LinearLayout>
