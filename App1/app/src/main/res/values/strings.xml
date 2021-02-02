@@ -6,10 +6,6 @@
     <string name="name">Prénom NOM</string>
     <string name="phoneNumber">numéro</string>
     <string name="mailAddr">Prenom.Nom@enseirb-matmeca.fr</string>
-    <string name="postalAddrRoad">Adresse</string>
-    <string name="postalAddrCode">Code Postal</string>
-    <string name="postalAddrCity">Ville</string>
-    <string name="note">note</string>
-
+    <string name="postalAddr">Adresse</string>
 
 </resources>
