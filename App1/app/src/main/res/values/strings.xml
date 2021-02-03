@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">App1</string>
+    <string name="title_activity_scrolling_contact"></string>
+    <string name="action_settings">Settings</string>
+
+    <string name="name">Prénom NOM</string>
+    <string name="phoneNumber">numéro</string>
+    <string name="mailAddr">Prenom.Nom@enseirb-matmeca.fr</string>
+    <string name="postalAddr">Adresse</string>
+
 </resources>
