@@ -4,6 +4,7 @@ package com.example.app1;
  * This class displays all the information of one contact in particular
  */
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -29,6 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContactCard extends AppCompatActivity {
+
+    private static final String RAW_CONTACT_ID   = ContactsContract.Data.RAW_CONTACT_ID;
+    private static final String MIMETYPE         = ContactsContract.Data.MIMETYPE;
+
+    private static final String ACCOUNT_TYPE     = ContactsContract.RawContacts.ACCOUNT_TYPE;
+    private static final String ACCOUNT_NAME     = ContactsContract.RawContacts.ACCOUNT_NAME;
+    private static final Uri RAW_CONTENT_URI     = ContactsContract.RawContacts.CONTENT_URI;
 
     private static final String ID               = ContactsContract.Contacts._ID;
     private static final Uri CONTENT_URI         = ContactsContract.Contacts.CONTENT_URI;
@@ -57,6 +65,7 @@ public class ContactCard extends AppCompatActivity {
 
     private static final Uri PROVIDER = android.provider.ContactsContract.Data.CONTENT_URI;
     private ArrayList<android.content.ContentProviderOperation> ops = new ArrayList<android.content.ContentProviderOperation>();
+    private String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
 
     private String CONTACT_ID;
     private String name;
@@ -199,39 +208,37 @@ public class ContactCard extends AppCompatActivity {
         phones  = displayPhone.getText().toString();
         addr    = displayAddr.getText().toString();
 
-        String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
-
         if (CONTACT_ID.isEmpty()) {
             ops.add(android.content.ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
-                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                    .withValue(ACCOUNT_TYPE, null)
+                    .withValue(ACCOUNT_NAME, null)
                     .build());
 
             if (!name.isEmpty()) {
                 ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                        .withValue(ContactsContract.Data.MIMETYPE, NAME_TYPE)
+                        .withValueBackReference(RAW_CONTACT_ID, 0)
+                        .withValue(MIMETYPE, NAME_TYPE)
                         .withValue(NAME, name)
                         .build());
             }
             if (!emails.equals(R.id.mailAddr)) {
                 ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                        .withValue(ContactsContract.Data.MIMETYPE, EMAIL_TYPE)
+                        .withValueBackReference(RAW_CONTACT_ID, 0)
+                        .withValue(MIMETYPE, EMAIL_TYPE)
                         .withValue(EMAIL, emails)
                         .build());
             }
             if (!phones.equals(R.id.phoneNumber)) {
                 ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                        .withValue(ContactsContract.Data.MIMETYPE, PHONE_TYPE)
+                        .withValueBackReference(RAW_CONTACT_ID, 0)
+                        .withValue(MIMETYPE, PHONE_TYPE)
                         .withValue(NUMBER, phones)
                         .build());
             }
             if (!addr.equals(R.id.postalAddr)) {
                 ops.add(android.content.ContentProviderOperation.newInsert(PROVIDER)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                        .withValue(ContactsContract.Data.MIMETYPE, ADDR_TYPE)
+                        .withValueBackReference(RAW_CONTACT_ID, 0)
+                        .withValue(MIMETYPE, ADDR_TYPE)
                         .withValue(POSTAL_ADDRESS, addr)
                         .build());
             }
@@ -270,6 +277,7 @@ public class ContactCard extends AppCompatActivity {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        ops.clear();
     }
 
     // This method permits to open Google Maps to have the route to the contact address
@@ -299,5 +307,21 @@ public class ContactCard extends AppCompatActivity {
             mailIntent.putExtra(Intent.EXTRA_EMAIL, emailList.get(0));
             startActivity(mailIntent);
         }
+    }
+
+    public void onClickDelete (View view) {
+        ops.add(ContentProviderOperation.newDelete(RAW_CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ?", new String[]{CONTACT_ID})
+                .build());
+        try {
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, ops);
+        } catch (OperationApplicationException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        ops.clear();
+        Intent intent = new Intent(this,MainActivity.class);
+        this.startActivity(intent);
     }
 }

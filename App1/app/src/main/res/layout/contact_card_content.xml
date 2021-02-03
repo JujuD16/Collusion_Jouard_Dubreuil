@@ -123,6 +123,14 @@
 
         </TableRow>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:onClick="onClickDelete"
+            app:srcCompat="@android:drawable/ic_delete" />
+
     </TableLayout>
 
 
