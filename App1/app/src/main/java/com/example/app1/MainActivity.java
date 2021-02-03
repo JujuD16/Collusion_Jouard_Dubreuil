@@ -13,22 +13,31 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Uri CONTENT_URI     = ContactsContract.Contacts.CONTENT_URI;
-    private String ID           = ContactsContract.Contacts._ID;
-    private String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
+    private Uri CONTENT_VCARD_URI = ContactsContract.Contacts.CONTENT_VCARD_URI;
+    private Uri CONTENT_URI       = ContactsContract.Contacts.CONTENT_URI;
+    private String ID             = ContactsContract.Contacts._ID;
+    private String DISPLAY_NAME   = ContactsContract.Contacts.DISPLAY_NAME;
+    private String LOOKUP_KEY     = ContactsContract.Contacts.LOOKUP_KEY;
 
     private RecyclerView recyclerView;
     private ContactsAdapter contactsAdapter;
@@ -38,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ContentResolver contentResolver;
     private Cursor cursor;
+    private ArrayList<String> vCard = new ArrayList<String>();
 
     // This method initialise the activity
     @Override
@@ -105,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
 
                 // add the contact to the list
                 contactInfoList.add(contactInfo);
+
+                // recover the contact vCard for the App 2
+                getContact_vCard(cursor);
+
             }
             contactsAdapter.notifyDataSetChanged();
         }
@@ -127,5 +141,64 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this,ContactCard.class);
         intent.putExtra("id", "");
         this.startActivity(intent);
+    }
+
+    public void getContact_vCard(Cursor cursor){
+
+        String lookupKey = cursor.getString(cursor.getColumnIndex(LOOKUP_KEY));
+        Uri vCardUri = Uri.withAppendedPath(CONTENT_VCARD_URI, lookupKey);
+        AssetFileDescriptor assetFileDescriptor;
+        String vCardString ="";
+
+        if (Build.VERSION.SDK_INT >= 24) {
+
+            FileInputStream inputStream = null;
+            byte[] buffer = new byte[4096];
+            ByteArrayOutputStream outputStream = null;
+            try {
+                assetFileDescriptor = contentResolver.openAssetFileDescriptor(vCardUri, "r");
+
+                if (assetFileDescriptor != null) {
+                    outputStream = new ByteArrayOutputStream();
+                    int read = 0;
+                    inputStream = assetFileDescriptor.createInputStream();
+                    while ((read = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, read);
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                Log.v("TAG", "vCard for the contact " + lookupKey + " not found", e);
+            } catch (IOException e) {
+                Log.v("TAG", "Problem creating stream from the assetFileDescriptor.", e);
+            } finally {
+                try {
+                    if (outputStream != null)
+                        outputStream.close();
+                } catch (IOException e) {
+                }
+
+                try {
+                    if (inputStream != null)
+                        inputStream.close();
+                } catch (IOException e) {
+                }
+            }
+            vCardString = new String(outputStream.toByteArray());
+        }
+        else {
+
+            try {
+                assetFileDescriptor = contentResolver.openAssetFileDescriptor(vCardUri, "r");
+                FileInputStream fileInputStream = assetFileDescriptor.createInputStream();
+                byte[] buf = new byte[(int) assetFileDescriptor.getDeclaredLength()];
+                fileInputStream.read(buf);
+                vCardString = new String(buf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Log.v("TAG", "vCard for the contact " + cursor.getString(cursor.getColumnIndex(DISPLAY_NAME)));
+        vCard.add(vCardString);
     }
 }
