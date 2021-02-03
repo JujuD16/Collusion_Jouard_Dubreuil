@@ -10,9 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
@@ -49,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private ArrayList<String> vCard = new ArrayList<String>();
 
-    // This method initialise the activity
+    private int CHILD_ACTIVITY_CODE = 14;
+
+    // This method initialises the activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewInitialisation();
 
         requestContactsPermissions();
+
+        // share the contacts with the App 2
+        sendContact_vCard();
     }
 
     // This method initialises the recyclerView that permits to print the dynamic
@@ -69,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    // This method request the permission to download contacts from the device
+    // This method requests the permission to download contacts from the device
     public void requestContactsPermissions(){
         boolean userDidNotGrantedTheApp =
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
@@ -124,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // This method rewrite the method invoked for every call on
+    // This method rewrites the method invoked for every call on
     // ActivityCompat.requestPermissions(android.app.Activity, String[], int).
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -136,14 +144,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // This method launch the page to create a new contact
+    // This method launches the page to create a new contact
     public void onClickPlus (View view) {
         Intent intent = new Intent(this,ContactCard.class);
         intent.putExtra("id", "");
         this.startActivity(intent);
     }
 
-    public void getContact_vCard(Cursor cursor){
+    // This method recovers all the contacts in vCard format
+    private void getContact_vCard(Cursor cursor){
 
         String lookupKey = cursor.getString(cursor.getColumnIndex(LOOKUP_KEY));
         Uri vCardUri = Uri.withAppendedPath(CONTENT_VCARD_URI, lookupKey);
@@ -197,8 +206,29 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
         Log.v("TAG", "vCard for the contact " + cursor.getString(cursor.getColumnIndex(DISPLAY_NAME)));
         vCard.add(vCardString);
+    }
+
+    // This method sends all the contacts in vCard format to the App 2
+    private void sendContact_vCard(){
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setClassName("com.example.app2", "com.example.app2.MainActivity");
+        shareIntent.putStringArrayListExtra("vCards", vCard);
+        shareIntent.setType("text/plain");
+
+        startActivityForResult(shareIntent, CHILD_ACTIVITY_CODE );
+    }
+
+    // This method registers a callback for an Activity Result
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // recover response from App 2
+        if (requestCode == CHILD_ACTIVITY_CODE && resultCode == RESULT_OK) {
+            Log.v("TAG", "Contacts sent to App 2");
+        }
     }
 }

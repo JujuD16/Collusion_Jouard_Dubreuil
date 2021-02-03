@@ -3,9 +3,13 @@ package com.example.app2;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -24,11 +28,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private Database mydb;
+    private ArrayList<String> vCard = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mydb = new Database(this);
         this.updateAdapter();
+
+        // recover contacts if the App 1 launch the App thanks to an Intent
+        recoverContacts();
     }
 
     private void updateAdapter(){
@@ -133,5 +142,16 @@ public class MainActivity extends AppCompatActivity {
         viewNote.setVisibility(View.GONE);
         note1.setVisibility(View.GONE);
         note2.setVisibility(View.GONE);
+    }
+
+    private void recoverContacts() {
+        Intent receivedIntent = getIntent();
+        this.vCard = receivedIntent.getStringArrayListExtra("vCards");
+        if (this.vCard != null) {
+            Log.v("TAG", "contacts length: " + this.vCard.size());
+
+            setResult(RESULT_OK, receivedIntent);
+            finish();
+        }
     }
 }
